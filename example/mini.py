@@ -1,21 +1,28 @@
+"""
+这是一个最小化的 stagesepx 使用例子
+每一行的注释均可以在 cut_and_classify.py 中找到
+"""
 from stagesepx.cutter import VideoCutter
-from stagesepx.classifier import SSIMClassifier
+from stagesepx.classifier import SVMClassifier
 from stagesepx.reporter import Reporter
+from stagesepx.video import VideoObject
 
-# cut
-video_path = '../test.mp4'
+video_path = "../demo.mp4"
+video = VideoObject(video_path)
+video.load_frames()
+
+# --- cutter ---
 cutter = VideoCutter()
-res = cutter.cut(video_path)
-stable = res.get_stable_range()
+res = cutter.cut(video)
+stable, unstable = res.get_range()
+data_home = res.pick_and_save(stable, 5)
 
-# classify
-cl = SSIMClassifier()
-cl.load(stable)
+# --- classify ---
+cl = SVMClassifier()
+cl.load(data_home)
+cl.train()
+classify_result = cl.classify(video, stable)
 
-res = cl.classify(
-    video_path,
-    stable,
-)
-
-# draw
-Reporter.draw(res)
+# --- draw ---
+r = Reporter()
+r.draw(classify_result)

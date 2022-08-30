@@ -13,7 +13,7 @@ data_home = './cut_result'
 cl.load(data_home)
 # 开始分析即可
 res = cl.classify(
-    '../test.mp4',
+    '../demo.mp4',
     # 步长，可以自行设置用于平衡效率与颗粒度
     # 默认为1，即每帧都检测
     step=1
@@ -32,9 +32,13 @@ for each in res:
 
 # 为了更方便的可读性，stagesepx已经内置了图表绘制功能
 # 你可以直接把分析结果绘制成图表
-Reporter.draw(
+report = Reporter()
+# 你可以将把一些文件夹路径插入到报告中
+# 这样你可以很方便地从报告中查看各项相关内容
+# 当然，你需要想好这些路径与报告最后所在位置之间的相对位置，以确保他们能够被访问到
+report.add_dir_link(data_home)
+
+report.draw(
     res,
     report_path='report.html',
-    # 在结果报告中展示stage对应的图片
-    data_path=data_home,
 )

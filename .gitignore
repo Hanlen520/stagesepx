@@ -104,3 +104,8 @@ venv.bak/
 .mypy_cache/
 
 .idea/
+*.mp4
+
+example/*.mp4
+example/*.html
+example/*.h5

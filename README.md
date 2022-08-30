@@ -1,165 +1,271 @@
-<h1 align="center">stage sep(aration) x</h1>
+<h1 align="center">
+  <img src="./docs/pics/brand.svg">
+</h1>
+
+<h3 align="center">stage sep(aration) x</h3>
 <p align="center">
     <em>detect stages in video automatically</em>
 </p>
 
 ---
-[![PyPI version](https://badge.fury.io/py/stagesepx.svg)](https://badge.fury.io/py/stagesepx)
-[![Build Status](https://travis-ci.org/williamfzc/stagesepx.svg?branch=master)](https://travis-ci.org/williamfzc/stagesepx)
-[![Maintainability](https://api.codeclimate.com/v1/badges/ef27756ce9a4f7f4ba94/maintainability)](https://codeclimate.com/github/williamfzc/stagesepx/maintainability)
+
+| Type                 | Status                                                                                                                                                                                            |
+|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| package version      | [![PyPI version](https://badge.fury.io/py/stagesepx.svg)](https://badge.fury.io/py/stagesepx)                                                                                                    |
+| python version       | ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/stagesepx)                                                                                                                       |
+| auto test            | ![CI Status](https://github.com/williamfzc/stagesepx/workflows/smoketest/badge.svg)                                                                                                              |
+| code maintainability | [![Maintainability](https://api.codeclimate.com/v1/badges/ef27756ce9a4f7f4ba94/maintainability)](https://codeclimate.com/github/williamfzc/stagesepx/maintainability) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/williamfzc/stagesepx.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/williamfzc/stagesepx/context:python)                           |
+| code coverage        | [![codecov](https://codecov.io/gh/williamfzc/stagesepx/branch/master/graph/badge.svg)](https://codecov.io/gh/williamfzc/stagesepx)                                                               |
+| docker build status  | ![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/williamfzc/stagesepx) ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/williamfzc/stagesepx) |
+| code style           | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)                                                                                 |
+| stat           | [![Downloads](https://pepy.tech/badge/stagesepx)](https://pepy.tech/project/stagesepx)  [![Downloads](https://pepy.tech/badge/stagesepx/month)](https://pepy.tech/project/stagesepx) [![Downloads](https://pepy.tech/badge/stagesepx/week)](https://pepy.tech/project/stagesepx)                                                              |
 
 ---
 
-## stagesepx 能做什么
+> 2022/08/13：在 0.18.0 之后，ffmpeg 以 [imageio_ffmpeg](https://github.com/imageio/imageio-ffmpeg) 方式内置（请自行评估其LICENSE影响）。此版本为解决opencv版本及M1芯片的限制，并不再需要额外安装ffmpeg。详见 [#178](https://github.com/williamfzc/stagesepx/issues/178)。
+>
+> 2022/03/30：官方不维护任何诸如微信群、QQ群的多人群组，所有信息请通过issue公开交流。不需要任何捐赠支持，如遇到涉及金钱相关的信息请不要相信。
+> 
+> 2021/12/15：在 0.16.0 之后，stagesepx 将开始提供部分功能测试的支持，详见 [#158](https://github.com/williamfzc/stagesepx/issues/158)
+> 
+> 2020/05/21：目前，该项目已经达到一个较为稳定的状态，并顺利在多家头部公司、团队落地，作为正式工具存在。Bug跟踪与建议请优先通过 [issue](https://github.com/williamfzc/stagesepx/issues) 联系我，感谢所有支持过这个项目的人。欢迎有心优化的同学、落地成功的团队共同建设：）
 
-在软件工程领域，视频是一种较为通用的UI（现象）描述方法。它能够记录下用户到底做了哪些操作，以及界面发生了什么事情。例如，下面的例子描述了从桌面打开chrome进入amazon主页的过程：
+---
 
-[![openAmazonFromChrome.gif](https://i.loli.net/2019/07/17/5d2e8ed1e9d0b49825.gif)](https://i.loli.net/2019/07/17/5d2e8ed1e9d0b49825.gif)
+> [English README here](./README_en.md)
 
-stagesepx能够**自动侦测**并提取视频中的稳定或不稳定的阶段（例子中，stagesepx认为视频中包含三个稳定的阶段，分别是点击前、点击时与页面加载完成后）：
+这段视频展示了一个应用的完整启动过程：
 
-[![stage-min.png](https://i.loli.net/2019/07/17/5d2e97c5e3a0e96365.png)](https://i.loli.net/2019/07/17/5d2e97c5e3a0e96365.png)
+![video_readme.gif](https://i.loli.net/2019/09/01/tXRhB6ai9jAZFmc.gif)
 
-然后，自动得到每个阶段对应的时间区间：
+将视频传递给 stagesepx，它将自动分析拆解，得到视频中所有的阶段。包括变化的过程及其耗时，以及在稳定的阶段停留的时长：
 
-[![stage_trend.png](https://i.loli.net/2019/07/17/5d2ea6720c58d44996.png)](https://i.loli.net/2019/07/17/5d2ea6720c58d44996.png)
+![taobao_startup.png](https://i.loli.net/2019/11/23/Cio39V4AhmWOyFL.png)
 
-例如，从图中可以看出：
+你可以据此得到每个阶段对应的精确耗时。
 
-- 视频开始直到 0.76s 时维持在阶段0
-- 在 0.76s 时从阶段0切换到阶段1
-- 在 0.92s 时从阶段1切换到阶段0，随后进入变化状态（当stagesepx无法将帧分为某特定类别、或帧不在待分析范围内时，会被标记为 -1，一般会在页面发生变化的过程中出现）
-- 在 1.16s 时到达阶段2
-- ...
+### 跨端运作
 
-以此类推，我们能够对视频的每个阶段进行非常细致的评估。通过观察视频也可以发现，识别效果与实际完全一致。
+当然，它是天然跨端的，例如web端。甚至，任何端：
 
-在运行过程中，stagesepx可以将对应阶段的图片保存下来，你可以很轻松地知道每个阶段到底发生了什么：
+![sugar.gif](https://i.loli.net/2019/11/23/BCjI8PiJrgmxQUt.gif)
 
-[![sample_pic_list.png](https://i.loli.net/2019/07/22/5d35b5e58904593354.png)](https://i.loli.net/2019/07/22/5d35b5e58904593354.png)
+![sugar](https://i.loli.net/2019/11/23/DCpbdlNftcQ3v2w.png)
 
-**而所有的一切只需要一个视频，无需前置模板、无需提前学习。**
+### 高准确度
 
-## 应用举例
+与视频一致的高准确度。以秒表为例：
 
-所有stagesepx需要的只是一个视频，而且它本质上只跟视频有关联，并没有任何特定的使用场景！所以，你可以尽情发挥你的想象力，用它帮助你实现更多的功能。
+![accuracy.png](https://i.loli.net/2019/10/02/Cboj743UwRQmgPS.png)
 
-### APP
+可以看到，与秒表的表现几乎没有差异。**请注意，这里的准确度指的是 stagesepx 能够精确还原视频本身的数据与表现。而对于现象（例如某某时间点出现什么状态）而言，准确度很大程度上取决于视频本身，如fps/分辨率等。**
 
-- 前面提到的应用启动速度计算
-- 那么同理，页面切换速度等方面都可以应用
-- 除了性能，你可以使用切割器对视频切割后，用诸如[findit](https://github.com/williamfzc/findit)等图像识别方案对功能性进行校验
-- 除了应用，游戏这种无法用传统测试方法的场景更是它的主场
-- ...
+### 彻底解耦 & 可编程
 
-### 除了APP？
+如果比起报告，更希望亲自处理原始数据，进而进行二次开发，你可以直接将 report 部分去除。如此做，你将得到一个 python 对象供你随意使用。它提供了大量的API，例如转换成字典：
 
-- 除了移动端，当然PC、网页也可以同理计算出结果
-- 甚至任何视频？
-
-[![pen.gif](https://i.loli.net/2019/07/22/5d35a84e3e0df82450.gif)](https://i.loli.net/2019/07/22/5d35a84e3e0df82450.gif)
-
-你可以直接得到出笔进入与移除的耗时！
-
-[![pen_chart.png](https://i.loli.net/2019/07/22/5d35a8858640e67521.png)](https://i.loli.net/2019/07/22/5d35a8858640e67521.png)
-
-Do whatever you want:)
-
-## 使用
-
-### 安装
-
-Python >= 3.6
-
-```python
-pip install stagesepx 
+```text
+{
+	"data": [{
+		"data": null,
+		"frame_id": 1,
+		"stage": "0",
+		"timestamp": 0.0,
+		"video_path": "../demo.mp4"
+	}, {
+		"data": null,
+		"frame_id": 2,
+		"stage": "0",
+		"timestamp": 0.04,
+		"video_path": "../demo.mp4"
+	}, {
+		"data": null,
+		"frame_id": 3,
+		"stage": "0",
+		"timestamp": 0.08,
+		"video_path": "../demo.mp4"
+	}, {
+	
+  ...
 ```
 
-### 例子
+从这个字典中我们可以知道，每一帧分别对应的：
 
-sample code中提供了详细的注释。
+- 被分类到哪一个类别
+- 时间戳
+- 帧编号
+- ...
 
-- 切割器
-    - [常规分类器](./example/cut.py)
-- 分类器
-    - [常规分类器](./example/classify.py)
-    - [SVM分类器](./example/classify_with_svm.py)
-- 完整例子
-    - [单视频](./example/cut_and_classify.py)
-    - [多视频](./example/multi_video.py)
+用户可以随意处理这些数据，无论是保存或是交给下一段代码。
 
-例子中使用的视频可以[点此](https://raw.githubusercontent.com/williamfzc/stagesep2-sample/master/videos/demo.mp4)下载。
+### 完整自动化支持 & 规模化
 
-## 还想要更多功能？
+- 既然它是可编程的，那么它必然是朝着彻底替代人力的方向演进的。这也是它最强大的特性；
+- 它允许用户利用自己的训练集进行模型训练，利用神经网络进行规模化、全自动化的特定阶段耗时计算；
+- 此方案能够被广泛应用到各类业务迭代中，与持续集成配合，有效降低人力消耗；
+- 一些方向参考：
+    - 为你的应用建立高频次的性能回归测试，形成benchmark
+    - 对模型进行补足，为一系列同类应用（如小程序、小游戏，etc.）构建巡检能力
+    - ...
 
-当然，stagesepx不仅如此。但在开始下面的阅读之前，你需要了解 切割器（cutter）与 分类器（classifier）。stagesepx主要由这两个概念组成。
+具体可参见 [将 stagesepx 应用到实际业务中](https://github.com/williamfzc/work_with_stagesepx)。
 
-### 切割器
+---
 
-顾名思义，切割器的功能是将一个视频按照一定的规律切割成多个部分。他负责视频阶段划分与采样，作为数据采集者为其他工具（例如AI模型）提供自动化的数据支持。它应该提供友好的接口或其他形式为外部（包括分类器）提供支持。例如，`pick_and_save`方法完全是为了能够使数据直接被 [keras](https://github.com/keras-team/keras) 利用而设计的。
+- 标准模式下无需前置训练与学习
+- 更少的代码需要
+- 高度可配置化，适应不同场景
+- 支持与其他框架结合，融入你的业务
+- 所有你需要的，只是一个视频
 
-切割器的定位是预处理，降低其他模块的运作成本及重复度。得到稳定区间之后，我们可以知道视频中有几个稳定阶段、提取稳定阶段对应的帧等等。在此基础上，你可以很轻松地对阶段进行图片采样（例子中为每个阶段采集3张图片，一共有3个稳定阶段，分别名为0、1、2）后保存起来，以备他用（例如AI训练、功能检测等等）：
+## 开始
 
-[![sample_after_cut.png](https://i.loli.net/2019/07/17/5d2ea54271fe256939.png)](https://i.loli.net/2019/07/17/5d2ea54271fe256939.png)
+### 正式使用
 
-### 分类器
+> 在正式落地时，推荐使用 完整的python脚本 而不是命令行，以保证更高的可编程性。完整的落地例子另外单独开了一个 repo 存放，[传送门](https://github.com/williamfzc/work_with_stagesepx)。
+> 请一定配合 [这篇文章](https://blog.csdn.net/wsc106/article/details/107351675) 使用，基本能解决90%的问题。
 
-针对上面的例子，分类器应运而生。它主要是加载（在AI分类器上可能是学习）一些分类好的图片，并据此对帧（图片）进行分类。
+- 配置：
+    - [用30行代码快速跑一个demo](example/mini.py)
+    - [30行代码怎么没有注释](example/stable.py)
+    - [还有更多配置吗](example/cut_and_classify.py)
+- 应用：
+    - [我想结合真实场景理解这个项目的原理](https://github.com/150109514/stagesepx_with_keras)
+    - [我想看看实际落地方案，最好有把饭喂嘴里的例子](https://github.com/williamfzc/work_with_stagesepx)
+    - [我们的app很复杂，能搞定吗](https://testerhome.com/topics/22215)
+    - [太麻烦了，有没有开箱即用、简单配置下可以落地的工具](https://github.com/williamfzc/sepmachine)
+- 其他：
+    - [我有问题要问](https://github.com/williamfzc/stagesepx/issues/new)
+    - [（使用时请参考上面的其他链接，此文档更新不及时）官方文档](https://williamfzc.github.io/stagesepx/)
 
-例如，当加载上述例子中稳定阶段对应的帧后，分类器即可将视频进行帧级别的分类，得到每个阶段的准确耗时。
+### 命令行
 
-![stage](docs/pics/stage.png)
-
-分类器的定位是对视频进行帧级别、高准确度的图片分类，并能够利用采样结果。它应该有不同的存在形态（例如机器学习模型）、以达到不同的分类效果。例如，你可以在前几次视频中用采样得到的数据训练你的AI模型，当它收敛之后在你未来的分析中你就可以直接利用训练好的模型进行分类，而不需要前置的采样过程了。[stagesep2](https://github.com/williamfzc/stagesep2)本质上是一个分类器。
-
-#### 不同形态的分类器
-
-stagesepx提供了两种不同类型的分类器，用于处理切割后的结果：
-
-- 传统的 SSIM 分类器无需训练且较为轻量化，多用于阶段较少、较为简单的视频；
-- SVM + HoG分类器在阶段复杂的视频上表现较好，你可以用不同的视频对它进行训练逐步提高它的识别效果，使其足够被用于生产环境；
-
-目前基于CNN的分类器已经初步完成，在稳定后会加入 ：）但目前来看，前两个分类器在较短视频上的应用已经足够了（可能需要调优，但原理上是够用的）。
-
-事实上，stagesepx在设计上更加鼓励开发者**根据自己的实际需要**设计并使用自己的分类器，以达到最好的效果。
-
-### 丰富的图表
-
-想得到耗时？stagesepx已经帮你计算好了：
-
-[![stage_time_cost.png](https://i.loli.net/2019/07/17/5d2ea67201ac283867.png)](https://i.loli.net/2019/07/17/5d2ea67201ac283867.png)
-
-或者，每个阶段的占比？
-
-[![pie.png](https://i.loli.net/2019/07/18/5d308bab8dd1b49028.png)](https://i.loli.net/2019/07/18/5d308bab8dd1b49028.png)
-
-...
-
-### 优异的性能表现
-
-在效率方面，吸取了 [stagesep2](https://github.com/williamfzc/stagesep2) 的教训（他真的很慢，而这一点让他很难被用于生产环境），在项目规划期我们就将性能的优先级提高。对于该视频而言，可以从日志中看到，它的耗时在惊人的300毫秒左右（windows7 i7-6700 3.4GHz 16G）：
+你也可以直接通过命令行使用，而无需编写脚本：
 
 ```bash
-2019-07-17 10:52:03.429 | INFO     | stagesepx.cutter:cut:200 - start cutting: test.mp4
-...
-2019-07-17 10:52:03.792 | INFO     | stagesepx.cutter:cut:203 - cut finished: test.mp4
+stagesepx analyse your_video.mp4 report.html
 ```
 
-除了常规的基于图像本身的优化手段，stagesepx主要利用采样机制进行性能优化，它指把时间域或空间域的连续量转化成离散量的过程。由于分类器的精确度要求较高，该机制更多被用于切割器部分，用于加速切割过程。它在计算量方面优化幅度是非常可观的，以5帧的步长为例，它相比优化前节省了80%的计算量。
+基于此，你可以非常方便地利用 shell 建立工作流。以 android 为例：
 
-当然，采样相比连续计算会存在一定的误差，如果你的视频变化较为激烈或者你希望有较高的准确度，你也可以关闭采样功能。
+```bash
+adb shell screenrecord --time-limit 10 /sdcard/demo.mp4
+adb pull /sdcard/demo.mp4 .
+stagesepx analyse demo.mp4 report.html
+```
 
-### 更强的稳定性
+关于结果不准确的问题请参考 [#46](https://github.com/williamfzc/stagesepx/issues/46)。
 
-stagesep2存在的另一个问题是，对视频本身的要求较高，抗干扰能力不强。这主要是它本身使用的模块（template matching、OCR等）导致的，旋转、分辨率、光照都会对识别效果造成影响；由于它强依赖预先准备好的模板图片，如果模板图片的录制环境与视频有所差异，很容易导致误判的发生。
+### 配置化运行（0.15.0）
 
-而SSIM本身的抗干扰能力相对较强。如果使用默认的SSIM分类器，所有的数据（训练集与测试集）都来源于同一个视频，保证了环境的一致性，规避了不同环境（例如旋转、光照、分辨率等）带来的影响，大幅度降低了误判的发生。
+当然，通常因为场景差异，我们需要对参数进行修改使其达到更好的效果。这使得用户需要投入一些精力在脚本编写上。在 0.15.0 之后，配置化运行的加入使用户能够在不需要编写脚本的情况下直接使用所有能力，大大降低了接入门槛。
 
-### Bug Report
+```json
+{
+  "output": ".",
+  "video": {
+    "path": "./PATH_TO_YOUR/VIDEO.mp4",
+    "fps": 30
+  }
+}
+```
 
-可想而知的，要考虑到所有的场景是非常困难的，在项目前期很难做到。
+命令行运行：
 
-有什么建议或者遇到问题可以通过issue反馈给我 :)
+```bash
+stagesepx run YOUR_CONFIG.json
+```
+
+即可达到与脚本相同的效果。其他的配置项可以参考：[work_with_stagesepx](https://github.com/williamfzc/work_with_stagesepx/tree/master/run_with_config)
+
+## 安装
+
+标准版（pypi）
+
+```bash
+pip install stagesepx
+```
+
+预览版（github）：
+
+```bash
+pip install --upgrade git+https://github.com/williamfzc/stagesepx.git
+```
+
+## 常见问题
+
+最终我还是决定通过 issue 面板维护所有的 Q&A ，毕竟问题的提出与回复是一个强交互过程。如果在查看下列链接之后你的问题依旧没有得到解答：
+
+- 请 [新建issue](https://github.com/williamfzc/stagesepx/issues/new)
+- 或在相关的 issue 下进行追问与补充
+- 你的提问将不止帮助到你一个人 :)
+
+问题列表：
+
+- [安装过程遇到问题？](https://github.com/williamfzc/stagesepx/issues/80)
+- [如何根据图表分析得出app启动的时间？](https://github.com/williamfzc/stagesepx/issues/73)
+- [日志太多了，如何关闭或者导出成文件？](https://github.com/williamfzc/stagesepx/issues/58)
+- [我的视频有 轮播图 或 干扰分类 的区域](https://github.com/williamfzc/stagesepx/issues/55)
+- [分类结果如何定制？](https://github.com/williamfzc/stagesepx/issues/48)
+- [算出来的结果不准确 / 跟传统方式有差距](https://github.com/williamfzc/stagesepx/issues/46)
+- [出现 OutOfMemoryError](https://github.com/williamfzc/stagesepx/issues/86)
+- [工具没法满足我的业务需要](https://github.com/williamfzc/stagesepx/issues/93)
+- [为什么报告中的时间戳跟实际不一样？](https://github.com/williamfzc/stagesepx/issues/75)
+- [自定义模型的分类结果不准确，跟我提供的训练集对不上](https://github.com/williamfzc/stagesepx/issues/100)
+- ...
+
+不仅是问题，如果有任何建议与交流想法，同样可以通过 issue 面板找到我。我们每天都会查看 issue 面板，无需担心跟进不足。
+
+## 相关文章
+
+- [图像分类、AI 与全自动性能测试](https://testerhome.com/topics/19978)
+- [全自动化的抖音启动速度测试](https://testerhome.com/topics/22215)
+- [(MTSC2019) 基于图像分类的下一代速度类测试解决方案](https://testerhome.com/topics/21874)
+
+## 架构
+
+![structure](./docs/pics/stagesepx.svg)
+
+## 参与项目
+
+### 规划
+
+在 1.0版本 之前，我们接下来的工作主要分为下面几个部分：
+
+#### 标准化
+
+随着越来越多的业务落地，我们开始思考它是否能够作为行业级别的方案。
+
+- [x] 基于实验室数据的准确度对比（未公开）
+- [x] [规范且适合落地的例子](https://github.com/williamfzc/work_with_stagesepx)
+- [ ] 边界情况下的确认
+- [x] 代码覆盖率 95%+
+- [ ] API参数相关文档
+
+#### 新需求的收集与开发
+
+该部分由 issue 面板管理。
+
+### 贡献代码
+
+欢迎感兴趣的同学为这个项目添砖加瓦，三个必备步骤：
+
+- 请在开始编码前留个 issue 告知你想完成的功能，因为可能这个功能已经在开发中或者已有；
+- commit规范我们严格遵守 [约定式提交](https://www.conventionalcommits.org/zh-hans/)；
+- 该repo有较为完善的单测与CI以保障整个项目的质量，在过去的迭代中发挥了巨大的作用。所以请为你新增的代码同步新增单元测试（具体写法请参考 tests 中的已有用例）。
+
+### 联系我们
+
+- 邮箱：`fengzc@vip.qq.com`
+- QQ：`178894043`
+
+## Changelog / History
+
+see [CHANGELOG.md](CHANGELOG.md)
+
+## Thanks
+
+Thank you [JetBrains](https://www.jetbrains.com/) for supporting the project with free product licenses.
 
 ## License
 
